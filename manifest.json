@@ -1,0 +1,24 @@
+{
+  "name": "Hend Scorekeeper",
+  "short_name": "Hend",
+  "description": "A simple scorekeeper for Hend card games.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8f4ee",
+  "theme_color": "#f8f4ee",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
