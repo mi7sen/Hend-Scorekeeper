@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Hend Scorekeeper</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f8f4ee">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{--bg:#f8f4ee;--card:#fff;--paper:#fffaf3;--line:#ddd4c8;--text:#2a2520;--muted:#7d746b;--accent:#2f77d6;--accent2:#d8e8ff;--green:#45a463;--green-bg:#e8f7ed;--red:#cf4f5b;--red-bg:#fdebed;--gold:#b88716}
+*{box-sizing:border-box}
+html,body{margin:0;max-width:100%;overflow-x:hidden}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
+body.rtl{direction:rtl;text-align:right}
+.app{max-width:680px;margin:auto;padding:14px 12px 96px}
+.top{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
+h1{font-size:25px;line-height:1.05;margin:0}h2{font-size:17px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 8px;color:var(--muted)}
+.sub,.tiny{color:var(--muted);font-size:12px;line-height:1.45}.sub{font-size:13px;margin-top:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0;box-shadow:0 8px 20px rgba(70,50,20,.06);overflow:hidden}
+button,input,select{max-width:100%;min-width:0;border-radius:12px;padding:12px;border:1px solid var(--line);font-size:15px;background:#fff;color:var(--text);outline:none}
+button{background:var(--accent);color:white;border:0;font-weight:850;cursor:pointer}
+button.secondary{background:#f1ece5;color:var(--text);border:1px solid var(--line)}button.danger{background:#fff0f1;color:var(--red);border:1px solid #f1b8bf}
+.lang{display:grid;grid-template-columns:1fr 1fr;gap:6px}.lang button{padding:9px 10px;font-size:13px}
+.pill{background:#efe5d6;border:1px solid var(--line);padding:8px 10px;border-radius:999px;font-size:13px;font-weight:850;white-space:nowrap}
+.name-row{display:grid;grid-template-columns:1fr;gap:7px;margin:7px 0}
+@media(min-width:520px){.name-row{grid-template-columns:1fr 1fr}}
+label{display:block;color:var(--muted);font-size:12px;margin:8px 0 4px}
+.summary-name,.saved-chip{display:inline-flex;gap:6px;align-items:center;padding:6px 8px;border-radius:999px;background:#f3eee6;border:1px solid var(--line);margin:3px;font-size:13px;font-weight:750}
+.saved-chip button{width:auto;margin:0;padding:1px 7px;border-radius:999px;background:#fbe8eb;color:var(--red);font-size:12px}
+.score-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.player-box{border:1px solid var(--line);border-radius:14px;padding:8px;background:var(--paper);text-align:center;min-width:0}
+.player-box.first{background:var(--green-bg);border-color:#addfbb}.player-box.last{background:var(--red-bg);border-color:#edb2ba}
+.player-box .name{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-box .score{font-size:21px;font-weight:950}.dealer{font-size:11px;color:var(--red);font-weight:850}
+.joker{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#fff7d9;border:1px solid #e2c86b;color:#8a6a00;font-size:12px;font-weight:900;cursor:pointer;user-select:none}.joker.full{background:var(--red-bg);border-color:#edb2ba;color:var(--red)}
+.scorecard-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:white}.scorecard{width:100%;table-layout:fixed;border-collapse:collapse}.scorecard th,.scorecard td{border-bottom:1px solid var(--line);border-inline-end:1px solid var(--line);padding:7px 3px;text-align:center;font-size:12px;word-break:break-word}.scorecard th{background:#f3eee6;color:var(--muted);font-weight:850}.scorecard th:first-child,.scorecard td:first-child{width:34px}.score-win{color:var(--green);font-weight:900}.score-penalty{background:#e7f0ff}.score-total{background:#f3eee6;font-weight:950}.empty{color:#c8bfb4}
+.player-select{display:grid;grid-template-columns:1fr 1fr;gap:7px}.player-select button{background:white;color:var(--text);border:1px solid var(--line);font-size:13px;padding:10px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.player-select button.selected{background:#e8f7ed;border-color:#95d7aa;color:#236b3a}
+.quick-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}.quick-buttons button{background:white;color:var(--text);border:1px solid var(--line);font-size:13px;padding:10px 6px}.quick-buttons button.selected{background:var(--accent2);border-color:#8dbbf5}@media(min-width:520px){.quick-buttons{grid-template-columns:repeat(4,1fr)}.player-select{grid-template-columns:repeat(4,1fr)}}
+.meld-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.meld-box{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:8px}.meld-box.winner{background:var(--green-bg);border-color:#addfbb}.meld-box .mname{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meld-box input{margin-top:5px;padding:9px 8px;font-size:14px;width:100%}
+@media(max-width:390px){.meld-grid{grid-template-columns:1fr}}
+details summary{font-weight:850;cursor:pointer;padding:8px 0}.need,.hist{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px;margin:7px 0}.need b{color:var(--gold)}.hist-title{font-weight:850}.hist-body{font-size:13px;color:var(--muted);line-height:1.5}
+.footer{position:fixed;left:0;right:0;bottom:0;background:rgba(248,244,238,.92);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:9px 12px calc(9px + env(safe-area-inset-bottom))}.footer-inner{max-width:680px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;padding:16px;overflow:auto}.modal{max-width:620px;margin:40px auto}.penalty-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.penalty-grid button{background:white;color:var(--text);border:1px solid var(--line)}
+
+.scorecard .meld-input-cell{background:#fffaf3}
+.scorecard .meld-input-cell input{width:100%;padding:7px 4px;font-size:13px;text-align:center;border-radius:9px}
+.scorecard .meld-winner-cell{background:#e8f7ed;color:#45a463;font-weight:900;font-size:12px}
+
+
+.penalty-box{margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
+.penalty-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.penalty-toggle button{background:#fff;color:var(--text);border:1px solid var(--line)}
+.penalty-toggle button.selected{background:#e7f0ff;border-color:#8dbbf5}
+#penaltySelectWrap{margin-top:8px}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><h1 id="title">Hend Scorekeeper</h1><div id="subtitle" class="sub"></div></div>
+    <div><div id="roundPill" class="pill"></div><div class="lang"><button class="secondary" onclick="setLang('en')">EN</button><button class="secondary" onclick="setLang('ar')">عربي</button></div></div>
+  </div>
+  <div id="main"></div>
+</div>
+
+</div>
+
+<div id="editModal" class="modal-bg">
+  <div class="modal card">
+    <h2 id="editTitle"></h2>
+    <div id="editText" class="tiny"></div>
+    <div class="penalty-grid">
+      <button onclick="startEdit()"></button>
+      <button class="secondary" onclick="closeEdit()"></button>
+    </div>
+  </div>
+</div>
+
+<div class="footer"><div class="footer-inner"><button class="secondary" id="undoBtn" onclick="undoRound()"></button><button class="danger" id="resetBtn" onclick="resetGame()"></button></div></div>
+
+<script>
+const STORAGE_KEY="hend-v28-penalty-toggle";
+const BACKUP_KEY="hend-v28-penalty-toggle";
+const NAMES_KEY="hend-saved-names-clean";
+const T={
+en:{title:"Hend Scorekeeper",sub:"Simple score sheet • 4 players • 9 rounds",round:"Round",setup:"Game Setup",saveHide:"Save players and hide setup",savedNames:"Saved names",addName:"Add player name",add:"Add",choose:"Saved name",seating:"Seating / left-side discard",left:"Who is on {p}'s left?",setupSaved:"Game Setup Saved",hidden:"Setup is hidden for this game.",editSetup:"Edit players / seating",standings:"Standings",dealer:"Dealer",scoreCard:"Score Card",addRound:"Add Round",editRound:"Edit Round",winner:"Winner",winType:"Win type",hend:"Hend",color:"Color / Joker",both:"Color + Joker",melds:"Melds",meldHelp:"Type base meld points. App multiplies automatically.",details:"More Details",needed:"What game do they need to be 1st?",history:"Round History",tap:"Tap to edit",won:"won by",first:"is currently 1st",start:"Start a round first.",addThis:"Add this round",saveEdited:"Save edited round",cancel:"Cancel",undo:"Undo last",reset:"Reset",total:"Total",penaltyQ:"Add penalty?",penaltyText:"Was there a +50 discard penalty?",yesPenalty:"Yes, add +50",noPenalty:"No penalty",choosePenalty:"Choose the player who gets +50"},
+ar:{title:"حساب هند",sub:"جدول بسيط • ٤ لاعبين • ٩ جولات",round:"جولة",setup:"تجهيز اللعبة",saveHide:"حفظ اللاعبين وإخفاء التجهيز",savedNames:"أسماء محفوظة",addName:"أضف اسم لاعب",add:"إضافة",choose:"اسم محفوظ",seating:"ترتيب الجلسة / السحب من اليسار",left:"من على يسار {p}؟",setupSaved:"تم حفظ التجهيز",hidden:"تم إخفاء التجهيز لهذه اللعبة.",editSetup:"تعديل اللاعبين / الجلسة",standings:"الترتيب",dealer:"ينزل",scoreCard:"جدول النقاط",addRound:"إضافة جولة",editRound:"تعديل جولة",winner:"الفائز",winType:"نوع الفوز",hend:"هند",color:"جوكر / حكم",both:"جوكر + حكم",melds:"تنزيل",meldHelp:"اكتب نقاط التنزيل الأساسية، والبرنامج يضربها تلقائياً.",details:"تفاصيل أكثر",needed:"ما اللعبة المطلوبة ليصبح أول؟",history:"سجل الجولات",tap:"اضغط للتعديل",won:"فاز بـ",first:"حالياً الأول",start:"ابدأ جولة أولاً.",addThis:"إضافة الجولة",saveEdited:"حفظ التعديل",cancel:"إلغاء",undo:"تراجع",reset:"مسح",total:"المجموع",penaltyQ:"إضافة غرامة؟",penaltyText:"هل توجد غرامة +50 بسبب السحب من الرمية؟",yesPenalty:"نعم، إضافة +50",noPenalty:"بدون غرامة",choosePenalty:"اختر اللاعب الذي تُضاف عليه +50"}
+};
+let S={players:["Player 1","Player 2","Player 3","Player 4"],scores:[0,0,0,0],rounds:[],leftMap:[3,0,1,2],savedNames:[],locked:false,lang:"en",win:0,base:200,jokers:[0,0,0,0],penaltyOn:false,penaltyPlayer:0};
+let editing=null,pendingEdit=null,pendingRound=null;
+
+function tr(k,o={}){let s=(T[S.lang]||T.en)[k]||T.en[k]||k;Object.keys(o).forEach(x=>s=s.replace("{"+x+"}",o[x]));return s}
+function save(){
+  const data=JSON.stringify(S);
+  try{localStorage.setItem(STORAGE_KEY,data)}catch(e){console.warn("Primary save failed",e)}
+  try{localStorage.setItem(BACKUP_KEY,data)}catch(e){console.warn("Backup save failed",e)}
+  try{localStorage.setItem(NAMES_KEY,JSON.stringify(S.savedNames||[]))}catch(e){console.warn("Names save failed",e)}
+}
+function load(){
+  try{
+    let raw=localStorage.getItem(STORAGE_KEY) || localStorage.getItem(BACKUP_KEY) || "{}";
+    let x=JSON.parse(raw);
+    if(x && typeof x==="object") S={...S,...x};
+  }catch(e){console.warn("Load failed",e)}
+  try{
+    let n=JSON.parse(localStorage.getItem(NAMES_KEY)||"[]");
+    if(Array.isArray(n))S.savedNames=[...new Set([...(S.savedNames||[]),...n])];
+  }catch(e){console.warn("Names load failed",e)}
+  if(!Array.isArray(S.players)||S.players.length!==4)S.players=["Player 1","Player 2","Player 3","Player 4"];
+  if(!Array.isArray(S.scores)||S.scores.length!==4)S.scores=[0,0,0,0];
+  if(!Array.isArray(S.rounds))S.rounds=[];
+  if(!Array.isArray(S.leftMap)||S.leftMap.length!==4)S.leftMap=[3,0,1,2];
+  if(!Array.isArray(S.jokers)||S.jokers.length!==4)S.jokers=[0,0,0,0];
+  if(!Array.isArray(S.savedNames))S.savedNames=[];
+}
+function setLang(l){S.lang=l;save();render()}
+function wScore(b){return b===200?-60:b===400?-120:b===800?-240:b===1600?-480:0}
+function mult(b){return b===200?2:b===400?4:b===800?8:b===1600?16:1}
+function wName(b){return b===200?tr("hend"):b===400?tr("color"):b===800?tr("both"):tr("massive")}
+function recalc(){S.scores=[0,0,0,0];S.rounds.forEach(r=>{for(let i=0;i<4;i++)S.scores[i]+=r.roundScores[i]})}
+function ranked(){return S.players.map((n,i)=>({n,score:S.scores[i],i})).sort((a,b)=>a.score-b.score)}
+function cycleJoker(i){S.jokers[i]=(S.jokers[i]+1)%3;save();render()}
+
+function setupHtml(){
+  let opts='<option value="">'+tr("choose")+'</option>'+S.savedNames.map(n=>`<option value="${n}">${n}</option>`).join("");
+  let p=[0,1,2,3].map(i=>`<label>Player ${i+1}</label><div class="name-row"><input id="name${i}" value="${S.players[i]}"><select onchange="if(this.value)document.getElementById('name${i}').value=this.value">${opts}</select></div>`).join("");
+  let saved=S.savedNames.map(n=>`<span class="saved-chip">${n}<button onclick="removeName('${n.replace(/'/g,"\\'")}')">×</button></span>`).join("");
+  return `<div class="card"><h2>${tr("setup")}</h2>${p}<button class="secondary" onclick="saveSetup()">${tr("saveHide")}</button><h3>${tr("savedNames")}</h3><div class="name-row"><input id="newName" placeholder="${tr("addName")}"><button onclick="addName()">${tr("add")}</button></div><div class="tiny">${saved}</div></div>`
+}
+function saveSetup(){
+  for(let i=0;i<4;i++){
+    let v=document.getElementById("name"+i).value.trim();
+    S.players[i]=v||`Player ${i+1}`;
+    if(v&&!S.savedNames.includes(v))S.savedNames.push(v);
+  }
+  S.savedNames.sort((a,b)=>a.localeCompare(b));
+  S.locked=true;
+  save();
+  render();
+}
+function addName(){let v=document.getElementById("newName").value.trim();if(v&&!S.savedNames.includes(v)){S.savedNames.push(v);S.savedNames.sort((a,b)=>a.localeCompare(b));save();render()}}
+function removeName(n){S.savedNames=S.savedNames.filter(x=>x!==n);save();render()}
+function summaryHtml(){return `<div class="card"><h2>${tr("setupSaved")}</h2>${S.players.map(n=>`<span class="summary-name">${n}</span>`).join("")}<div class="tiny" style="margin-top:8px">${tr("hidden")}</div><button class="secondary" onclick="S.locked=false;save();render()">${tr("editSetup")}</button></div>`}
+
+function standings(){let best=Math.min(...S.scores),worst=Math.max(...S.scores);return `<div class="card"><h2>${tr("standings")}</h2><div class="score-mini">${S.players.map((p,i)=>`<div class="player-box ${S.scores[i]===best?"first":""} ${S.rounds.length&&S.scores[i]===worst?"last":""}"><div class="name">${p}</div><div class="score">${S.scores[i]}</div><div class="joker ${S.jokers[i]===2?"full":""}" onclick="cycleJoker(${i})">J ${S.jokers[i]}/2</div>${S.rounds.length&&S.scores[i]===worst?`<div class="dealer">${tr("dealer")}</div>`:""}</div>`).join("")}</div></div>`}
+function scoreCard(){
+  let rows="";
+  for(let r=0;r<9;r++){
+    let R=S.rounds[r];
+    rows+=`<tr><td>${r+1}</td>`;
+    for(let i=0;i<4;i++){
+      if(!R){rows+=`<td class="empty">—</td>`;continue}
+      let c=i===R.winner?"score-win":"";
+      if(R.penaltyPlayer===i)c+=" score-penalty";
+      let v=R.roundScores[i];
+      rows+=`<td class="${c}">${v>0?"+":""}${v}</td>`;
+    }
+    rows+="</tr>";
+  }
+  rows+=`<tr class="score-total"><td>${tr("total")}</td>${S.scores.map(s=>`<td>${s}</td>`).join("")}</tr>`;
+  rows+=`<tr><td>${tr("melds")}</td>${S.players.map((p,i)=>i===S.win?`<td class="meld-winner-cell">${wScore(S.base)}</td>`:`<td class="meld-input-cell"><input id="meld${i}" type="number" placeholder="0"></td>`).join("")}</tr>`;
+  return `<div class="card"><h2>${tr("scoreCard")}</h2><div class="scorecard-wrap"><table class="scorecard"><thead><tr><th>#</th>${S.players.map(p=>`<th>${p}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div><div class="tiny" style="margin-top:6px">${tr("meldHelp")}</div></div>`
+}
+function selW(i){S.win=i;render()}function selB(b){S.base=b;render()}
+
+function setPenalty(on){
+  S.penaltyOn=on;
+  save();
+  render();
+}
+function setPenaltyPlayer(i){
+  S.penaltyPlayer=i;
+  save();
+}
+
+function roundForm(){
+  const opts=[{b:200,w:-60},{b:400,w:-120},{b:800,w:-240},{b:1600,w:-480}];
+  const penaltySelect = `<div id="penaltySelectWrap" style="${S.penaltyOn?'display:block':'display:none'}"><label>${tr("penaltyPlayer")||"Penalty player"}</label><select onchange="setPenaltyPlayer(Number(this.value))">${S.players.map((p,i)=>`<option value="${i}" ${S.penaltyPlayer===i?"selected":""}>${p}</option>`).join("")}</select></div>`;
+  return `<div class="card"><h2>${editing===null?tr("addRound"):tr("editRound")+" "+(editing+1)}</h2><label>${tr("winner")}</label><div class="player-select">${S.players.map((p,i)=>`<button class="${S.win===i?"selected":""}" onclick="selW(${i})">${p}</button>`).join("")}</div><label>${tr("winType")}</label><div class="quick-buttons">${opts.map(o=>`<button class="${S.base===o.b?"selected":""}" onclick="selB(${o.b})">${o.b}<br><span class="tiny">${o.w} / +${o.b}</span></button>`).join("")}</div><div class="penalty-box"><b>${S.lang==="ar"?"غرامة السحب":"Discard penalty"}</b><div class="penalty-toggle"><button class="${!S.penaltyOn?"selected":""}" onclick="setPenalty(false)">${S.lang==="ar"?"بدون غرامة":"No penalty"}</button><button class="${S.penaltyOn?"selected":""}" onclick="setPenalty(true)">+50</button></div>${penaltySelect}</div><button style="margin-top:10px" onclick="saveRound()">${editing===null?tr("addThis"):tr("saveEdited")}</button>${editing!==null?`<button class="secondary" onclick="editing=null;render()">${tr("cancel")}</button>`:""}</div>`
+}
+function buildRound(){let scores=[0,0,0,0],notes=[],meldBase=[null,null,null,null];for(let i=0;i<4;i++){if(i===S.win){scores[i]=wScore(S.base);continue}let raw=document.getElementById("meld"+i)?.value.trim()||"";if(raw){let val=Number(raw);if(Number.isNaN(val)||val<0){alert("Bad meld");return null}scores[i]=val*mult(S.base);meldBase[i]=val;notes.push(`${S.players[i]}: ${val} × ${mult(S.base)} = ${scores[i]}`)}else scores[i]=S.base}return{winner:S.win,base:S.base,penaltyPlayer:null,roundScores:scores,notes,meldBase}}
+function saveRound(){
+  if(editing===null&&S.rounds.length>=9)return alert("Game finished.");
+  let R=buildRound();
+  if(!R)return;
+  if(S.penaltyOn){
+    let i=Number(S.penaltyPlayer||0);
+    R.penaltyPlayer=i;
+    R.roundScores[i]+=50;
+    R.notes.push(`${S.players[i]} +50`);
+  }
+  if(editing!==null){
+    S.rounds[editing]=R;
+    editing=null;
+  }else{
+    S.rounds.push(R);
+  }
+  S.win=0;
+  S.base=200;
+  S.penaltyOn=false;
+  S.penaltyPlayer=0;
+  recalc();
+  save();
+  render();
+}
+function gamePlanFor(i){
+  let lead=ranked()[0];
+  if(i===lead.i)return tr("first");
+  let need=S.scores[i]-S.scores[lead.i]+1;
+  let remaining=Math.max(0,9-S.rounds.length);
+  if(remaining===0)return "—";
+  const games=[{label:"200",swing:260},{label:"400",swing:520},{label:"800",swing:1040},{label:"1600",swing:2080}];
+  let best=null;
+  function search(idx,plan,total,rounds){
+    if(total>=need){
+      let cand={plan:{...plan},total,rounds};
+      if(!best||cand.rounds<best.rounds||(cand.rounds===best.rounds&&cand.total<best.total))best=cand;
+      return;
+    }
+    if(idx>=games.length||rounds>=remaining)return;
+    let g=games[idx];
+    for(let c=0;c<=remaining-rounds;c++){
+      if(c)plan[g.label]=c;else delete plan[g.label];
+      search(idx+1,plan,total+c*g.swing,rounds+c);
+    }
+    delete plan[g.label];
+  }
+  search(0,{},0,0);
+  if(!best)return `Need more than ${remaining} wins`;
+  return Object.entries(best.plan).map(([k,v])=>`${k} × ${v}`).join(" + ");
+}
+function details(){let r=ranked();let need=S.rounds.length?r.map((p,idx)=>idx===0?`<div class="need"><b>${p.n}</b> ${tr("first")}</div>`:`<div class="need"><b>${p.n}</b>: ${gamePlanFor(p.i)}</div>`).join(""):`<div class="need tiny">${tr("start")}</div>`;let hist=S.rounds.length?S.rounds.map((R,i)=>`<div class="hist" onclick="openEdit(${i})"><div class="hist-title">${tr("round")} ${i+1}: ${S.players[R.winner]} ${tr("won")} ${wName(R.base)}</div><div class="hist-body">${S.players.map((p,x)=>`${p}: ${R.roundScores[x]>0?"+":""}${R.roundScores[x]}`).join("<br>")}<br>${tr("tap")}</div></div>`).join(""):"";return `<details class="card"><summary>${tr("details")}</summary><h3>${tr("needed")}</h3>${need}<h3>${tr("history")}</h3>${hist}</details>`}
+function openEdit(i){pendingEdit=i;document.getElementById("editTitle").innerText=tr("editRound")+" "+(i+1);document.getElementById("editText").innerText=S.players[S.rounds[i].winner]+" - "+wName(S.rounds[i].base);let btns=document.querySelectorAll("#editModal button");btns[0].innerText=tr("editRound");btns[1].innerText=tr("cancel");document.getElementById("editModal").style.display="block"}
+function closeEdit(){pendingEdit=null;document.getElementById("editModal").style.display="none"}
+function startEdit(){if(pendingEdit===null)return;editing=pendingEdit;let R=S.rounds[editing];S.win=R.winner;S.base=R.base;closeEdit();render();setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"}),50)}
+function undoRound(){if(editing!==null){editing=null;render();return}if(!S.rounds.length)return;S.rounds.pop();recalc();save();render()}
+function resetGame(){if(!confirm("Reset game?"))return;S.scores=[0,0,0,0];S.rounds=[];S.jokers=[0,0,0,0];editing=null;S.locked=false;S.win=0;S.base=200;save();render()}
+function render(){document.body.className=S.lang==="ar"?"rtl":"";document.documentElement.lang=S.lang;document.getElementById("title").innerText=tr("title");document.getElementById("subtitle").innerText=tr("sub");document.getElementById("roundPill").innerText=`${tr("round")} ${Math.min(S.rounds.length+1,9)} / 9`;document.getElementById("undoBtn").innerText=tr("undo");document.getElementById("resetBtn").innerText=tr("reset");document.getElementById("main").innerHTML=(S.locked?summaryHtml():setupHtml())+standings()+scoreCard()+roundForm()+details();if(editing!==null){let R=S.rounds[editing];setTimeout(()=>{if(R.meldBase){for(let i=0;i<4;i++){let el=document.getElementById("meld"+i);if(el&&R.meldBase[i]!==null)el.value=R.meldBase[i]}}},0)}}
+window.addEventListener("pagehide",()=>{try{save()}catch(e){console.warn(e)}});if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js?v=28"))}
+load();recalc();render();
+</script>
+</body>
+</html>
